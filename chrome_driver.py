@@ -60,10 +60,16 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
             proxy_list = f.read().splitlines()
         proxy = random.choice(proxy_list)
         parts = proxy.replace('http:', '').replace('//', '').replace('@', ':').split(':')
-        ip = parts[2]
-        port = parts[3]
-        username = parts[0]
-        password = parts[1]
+        if len(parts) == 4:
+            ip = parts[2]
+            port = parts[3]
+            username = parts[0]
+            password = parts[1]
+        else:
+            ip = parts[0]
+            port = parts[1]
+            username = ''
+            password = ''
         PROXY_HOST = ip  # rotating proxy or host
         PROXY_PORT = port  # port
         PROXY_USER = username  # username
@@ -137,4 +143,5 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
 
 
 if __name__ == "__main__":
-    update_chromedriver()
+    #update_chromedriver()
+    pass
