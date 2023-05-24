@@ -1,6 +1,8 @@
 import requests
 import os
 import random
+import re
+from requests.auth import HTTPProxyAuth
 
 
 def proxy_requests(url, use_proxy=False, method="get", **kwargs):
@@ -28,3 +30,37 @@ def proxy_requests(url, use_proxy=False, method="get", **kwargs):
         return r
     else:
         raise Exception('Error {} - {}'.format(r.status_code, url))
+
+class Proxy:
+    def __init__(self, proxy_input):
+        self.proxy_input = proxy_input
+        self.auth = HTTPProxyAuth(self.comp['user'], self.comp['pass'])
+        self.proxies = {
+            'http': '{}://{}:{}'.format(self.comp['schema'], self.comp['ip'], self.comp['port']),
+            'https': '{}://{}:{}'.format(self.comp['schema'], self.comp['ip'], self.comp['port'])
+        }
+
+    @property
+    def proxy_input(self):
+        return self._proxy_input
+    
+    @proxy_input.setter
+    def proxy_input(self, value):
+        parts = value.replace('@', ':').split(':')
+        comp = {}
+        for part in parts:
+            part = part.replace('//', '')
+            if part.startswith('http'):
+                comp['schema'] = part.replace('//', '')
+            elif re.search(r'\d+.\d+.\d+.\d+|\w+\.\w+\.\w+', part):
+                comp['ip'] = part
+            elif part.isdecimal():
+                comp['port'] = part
+            elif 'user' not in comp \
+                 and not re.search(r'\d+.\d+.\d+.\d+|\w+\.\w+\.\w+', part) \
+                 and not part.startswith('http'):
+                comp['user'] = part
+            else:
+                comp['pass'] = part
+        self.comp = comp
+        self._proxy_input = '{}://{}:{}@{}:{}'.format(comp['schema'], comp['user'], comp['pass'], comp['ip'], comp['port'])
