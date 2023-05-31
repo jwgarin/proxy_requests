@@ -4,6 +4,8 @@ import random
 import re
 from requests.auth import HTTPProxyAuth
 
+get = lambda url, use_proxy=False, method="get", **kwargs: proxy_requests(url, use_proxy=use_proxy, method="get", **kwargs)
+post = lambda url, use_proxy=False, method="post", **kwargs: proxy_requests(url, use_proxy=use_proxy, method="post", **kwargs)
 
 def proxy_requests(url, use_proxy=False, method="get", **kwargs):
     # Proxy format http://{USERNAME}:{PASSWORD}@{IP}:{PORT}
