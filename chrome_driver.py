@@ -12,6 +12,14 @@ from bs4 import BeautifulSoup
 import re
 import random
 import zipfile
+import platform
+import argparse
+
+parser = argparse.ArgumentParser('Chromedriver')
+parser.add_argument('--update', action='store_true', default=False, dest="update")
+args = parser.parse_args()
+
+update = args.update
 
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
 
@@ -42,9 +50,13 @@ def update_chromedriver():
         f.write(r.content)
     tree = ET.parse(xmlfile)
     root = tree.getroot()
-    chromedriver_link = urljoin('https://chromedriver.storage.googleapis.com/', [el for el in [el for el in root if len(el) > 0] if 'win32' in el[0].text][0][0].text)    
-    os.makedirs('chromedrivers\\{}'.format(version), exist_ok=True)
-    chrome_dir = 'chromedrivers\\{}\\chromedriver.zip'.format(version)
+    chromedriver_link = urljoin('https://chromedriver.storage.googleapis.com/', [el for el in [el for el in root if len(el) > 0] if ('win32' in el[0].text and platform.system() == 'Windows') or ('linux64' in el[0].text and platform.system() == "Linux")][0][0].text)
+    if platform.system() == 'Windows':
+        os.makedirs('chromedrivers\\{}'.format(version), exist_ok=True)
+        chrome_dir = 'chromedrivers\\{}\\chromedriver.zip'.format(version)
+    else:
+        os.makedirs('chromedrivers/{}'.format(version), exist_ok=True)
+        chrome_dir = 'chromedrivers/{}/chromedriver.zip'.format(version)
     r = requests.get(chromedriver_link)
     with open(chrome_dir, 'wb') as f:
         f.write(r.content)
@@ -143,5 +155,7 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
 
 
 if __name__ == "__main__":
-    #update_chromedriver()
-    pass
+    if update:
+        update_chromedriver()
+    else:
+        pass
