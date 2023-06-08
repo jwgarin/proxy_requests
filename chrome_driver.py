@@ -148,7 +148,7 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
     options = Options()
     options.headless = headless
     driver = webdriver.Chrome(
-        os.path.join(path, 'chromedriver.exe'),
+        os.path.join(path, 'chromedriver.exe' if platform.system() == 'Windows' else 'chromedriver'),
         chrome_options=chrome_options,
         options=options)
     return driver
