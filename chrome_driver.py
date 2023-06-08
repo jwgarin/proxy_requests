@@ -15,11 +15,7 @@ import zipfile
 import platform
 import argparse
 
-parser = argparse.ArgumentParser('Chromedriver')
-parser.add_argument('--update', action='store_true', default=False, dest="update")
-args = parser.parse_args()
-
-update = args.update
+update = None
 
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
 
@@ -155,6 +151,10 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser('Chromedriver')
+    parser.add_argument('--update', action='store_true', default=False, dest="update")
+    args = parser.parse_args()
+    update = args.update
     if update:
         update_chromedriver()
     else:
