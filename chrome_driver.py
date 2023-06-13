@@ -1,3 +1,11 @@
+"""
+This module provides utility functions for chrome driver
+
+Available functions:
+- update_chromedriver: downloads and update chromedriver in the working folder
+- get_chromedriver: initiate a driver instance
+"""
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import xml.etree.ElementTree as ET
@@ -14,10 +22,11 @@ import random
 import zipfile
 import platform
 import argparse
-
+#import undetected_chromedriver as uc
 update = None
 
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
+
 
 def update_chromedriver():
     logging.info('downloading latest chromedriver')
@@ -36,9 +45,10 @@ def update_chromedriver():
         'sec-gpc': '1',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     }
-    r = requests.get('https://chromedriver.chromium.org/home')
+    r = requests.get('https://chromedriver.chromium.org/downloads')
     s = BeautifulSoup(r.text, 'html.parser')
-    latest_stable_release = s.find(string='stable').find_parent('p').find('a')['href']
+    #latest_stable_release = s.find(string='stable').find_parent('p').find('a')['href']
+    latest_stable_release = s.find(string=re.compile('ChromeDriver 1')).find_parent('a')['href']
     version = re.search(r'(\d+.)*\d+', latest_stable_release).group()
     r = requests.get('https://chromedriver.storage.googleapis.com/?delimiter=/&prefix={}/'.format(version), headers=headers)
     xmlfile = '{}\\chromedrivers.xml'.format('cache')
@@ -62,7 +72,8 @@ def update_chromedriver():
 
 
 def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
-    chrome_options = webdriver.ChromeOptions()
+    #chrome_options = webdriver.ChromeOptions()
+    options = Options()
     if use_proxy:
         with open('proxies.txt') as f:
             proxy_list = f.read().splitlines()
@@ -137,16 +148,24 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
         with zipfile.ZipFile(pluginfile, 'w') as zp:
             zp.writestr("manifest.json", manifest_json)
             zp.writestr("background.js", background_js)
-        chrome_options.add_extension(pluginfile)
+        options.add_extension(pluginfile)
     path = os.path.dirname(os.path.abspath(__file__))
     if user_agent:
-        chrome_options.add_argument('--user-agent=%s' % user_agent)
-    options = Options()
+        #chrome_options.add_argument('--user-agent=%s' % user_agent)
+        options.add_argument('--user-agent=%s' % user_agent)
     options.headless = headless
-    driver = webdriver.Chrome(
-        os.path.join(path, 'chromedriver.exe' if platform.system() == 'Windows' else 'chromedriver'),
-        chrome_options=chrome_options,
-        options=options)
+    chrome_driver = 'chromedriver.exe' if platform.system() == 'Windows' else 'chromedriver'
+    chrome_dir = os.path.join(path, chrome_driver)
+    if float(sys.version_info[0] + sys.version_info[1]/10) <= 3.7:
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(executable_path='/cse/runtime/node_modules/chromedriver/lib/chromedriver/chromedriver', options=options)
+    else:
+        driver = webdriver.Chrome(
+            os.path.join(path, 'chromedriver.exe' if platform.system() == 'Windows' else 'chromedriver'),
+            options=options
+        )
     return driver
 
 
