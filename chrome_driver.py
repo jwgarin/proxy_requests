@@ -24,6 +24,7 @@ import platform
 import argparse
 #import undetected_chromedriver as uc
 update = None
+import sys
 
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
 
