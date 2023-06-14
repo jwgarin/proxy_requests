@@ -154,7 +154,8 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
     if user_agent:
         #chrome_options.add_argument('--user-agent=%s' % user_agent)
         options.add_argument('--user-agent=%s' % user_agent)
-    options.headless = headless
+    #options.headless = headless
+    options.add_argument('--headless')
     chrome_driver = 'chromedriver.exe' if platform.system() == 'Windows' else 'chromedriver'
     chrome_dir = os.path.join(path, chrome_driver)
     if float(sys.version_info[0] + sys.version_info[1]/10) <= 3.7:
@@ -163,10 +164,7 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
         options.add_argument('--disable-dev-shm-usage')
         driver = webdriver.Chrome(executable_path='/cse/runtime/node_modules/chromedriver/lib/chromedriver/chromedriver', options=options)
     else:
-        driver = webdriver.Chrome(
-            os.path.join(path, 'chromedriver.exe' if platform.system() == 'Windows' else 'chromedriver'),
-            options=options
-        )
+        driver = webdriver.Chrome(options=options)
     return driver
 
 
