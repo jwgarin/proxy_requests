@@ -155,7 +155,8 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
         #chrome_options.add_argument('--user-agent=%s' % user_agent)
         options.add_argument('--user-agent=%s' % user_agent)
     #options.headless = headless
-    options.add_argument('--headless')
+    if headless:
+        options.add_argument('--headless')
     chrome_driver = 'chromedriver.exe' if platform.system() == 'Windows' else 'chromedriver'
     chrome_dir = os.path.join(path, chrome_driver)
     if float(sys.version_info[0] + sys.version_info[1]/10) <= 3.7:
