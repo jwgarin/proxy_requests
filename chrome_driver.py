@@ -58,12 +58,8 @@ def update_chromedriver():
     tree = ET.parse(xmlfile)
     root = tree.getroot()
     chromedriver_link = urljoin('https://chromedriver.storage.googleapis.com/', [el for el in [el for el in root if len(el) > 0] if ('win32' in el[0].text and platform.system() == 'Windows') or ('linux64' in el[0].text and platform.system() == "Linux")][0][0].text)
-    if platform.system() == 'Windows':
-        os.makedirs('chromedrivers\\{}'.format(version), exist_ok=True)
-        chrome_dir = 'chromedrivers\\{}\\chromedriver.zip'.format(version)
-    else:
-        os.makedirs('chromedrivers/{}'.format(version), exist_ok=True)
-        chrome_dir = 'chromedrivers/{}/chromedriver.zip'.format(version)
+    os.makedirs(os.path.join('chromedrivers', version), exist_ok=True)
+    chrome_dir = os.path.join('chromedrivers', version, 'chromedriver.zip')
     r = requests.get(chromedriver_link)
     with open(chrome_dir, 'wb') as f:
         f.write(r.content)
