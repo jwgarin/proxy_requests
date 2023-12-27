@@ -23,9 +23,13 @@ import zipfile
 import platform
 import argparse
 #import undetected_chromedriver as uc
-update = None
 import sys
+import platform
+if platform.system() == 'Windows':
+    import chromedriver_binary
 
+
+update = None
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
 
 
@@ -161,7 +165,7 @@ def get_chromedriver(use_proxy=False, user_agent=None, headless=False):
         options.add_argument('--disable-dev-shm-usage')
         driver = webdriver.Chrome(executable_path='/cse/runtime/node_modules/chromedriver/lib/chromedriver/chromedriver', options=options)
     else:
-        driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(executable_path=chromedriver_binary.chromedriver_filename, options=options)
     return driver
 
 
